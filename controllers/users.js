@@ -5,7 +5,7 @@ const User = require('../models/user');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const NotFoundError = require('../errors/NotFoundError');
-const BadRequestError = require('../errors/BadRequestError');
+// const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 
 // const getUser = (req, res, next) => {
@@ -21,7 +21,7 @@ const ConflictError = require('../errors/ConflictError');
 
 const createUser = (req, res, next) => {
   const {
-    email, password, name, about, avatar,
+    email, password, name,
   } = req.body;
   User.findOne({ email })
     .then((user) => {
@@ -34,39 +34,35 @@ const createUser = (req, res, next) => {
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
-      about,
-      avatar,
       email,
       password: hash, // записываем хеш в базу
     }))
     .then((user) => res.status(200).send({
       data: {
         name: user.name,
-        about: user.about,
-        avatar: user.avatar,
         email: user.email,
       },
     }))
     .catch(next);
 };
 
-const updateUser = (req, res, next) => {
-  const { _id } = req.user;
-  const { name, about } = req.body;
-  User.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
-    .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: 'Нет пользователя с таким id' });
-      }
-      return res.send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequestError('переданы некорректные данные в метод');
-      }
-    })
-    .catch(next);
-};
+// const updateUser = (req, res, next) => {
+//   const { _id } = req.user;
+//   const { name, about } = req.body;
+//   User.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
+//     .then((user) => {
+//       if (!user) {
+//         return res.status(404).send({ message: 'Нет пользователя с таким id' });
+//       }
+//       return res.send(user);
+//     })
+//     .catch((err) => {
+//       if (err.name === 'ValidationError') {
+//         throw new BadRequestError('переданы некорректные данные в метод');
+//       }
+//     })
+//     .catch(next);
+// };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -96,18 +92,16 @@ const getUserInfo = (req, res, next) => {
         .status(200)
         .send(userById);
     })
-
     .catch(() => {
       throw new NotFoundError('Пользователя нет в базе данных');
     })
-
     .catch(next);
 };
 
 module.exports = {
   // getUser,
   createUser,
-  updateUser,
+  // updateUser,
   login,
   getUserInfo,
 };

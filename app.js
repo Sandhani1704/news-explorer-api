@@ -8,7 +8,7 @@ const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
 const routerUsers = require('./routes/users.js');
-const routerCards = require('./routes/cards.js');
+const routerArticles = require('./routes/article.js');
 const routerNonexistent = require('./routes/nonexistent.js');
 const { login, createUser } = require('./controllers/users.js');
 
@@ -36,18 +36,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger); // подключаем логгер запросов
 
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
+// app.get('/crash-test', () => {
+//   setTimeout(() => {
+//     throw new Error('Сервер сейчас упадёт');
+//   }, 0);
+// });
 
 // роуты для логина и регистрации не требующие авторизации
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(/^http[s]?:\/\/\w+/),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(6),
   }),
@@ -62,9 +60,9 @@ app.post('/signin', celebrate({
 
 // сначала вызовется auth, а затем, если авторизация успешна, routerUsers
 app.use('/', auth, routerUsers);
-// сначала вызовется auth, а затем, если авторизация успешна, createCard
-app.use('/', auth, routerCards);
-// app.get('/users/me', auth, routerUsers);
+// сначала вызовется auth, а затем, если авторизация успешна, createArticle
+app.use('/', auth, routerArticles);
+app.get('/users/me', auth, routerUsers);
 app.use('/', routerNonexistent);
 
 app.use(errorLogger); // подключаем логгер ошибок

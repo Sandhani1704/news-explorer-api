@@ -32,10 +32,11 @@ const createArticle = (req, res, next) => {
 // удаляет сохранённую статью  по _id
 const deleteArticle = (req, res, next) => {
   Article.findById(req.params.articleId)
+  .select("+owner")
     .then((article) => {
       if (!article) {
         throw new NotFoundError('Нет статьи с таким id');
-      } else if (article.owner.toString() !== req.user._id) {
+      } else if (article.owner.toString() !== req.user._id.toString()) {
         throw new ForbiddenError('Удалять можно только свои статьи');
       } else {
         Article.findByIdAndDelete(req.params.articleId)
