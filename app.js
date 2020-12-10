@@ -15,6 +15,14 @@ const { login, createUser } = require('./controllers/users.js');
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
+// console.log(process.env.NODE_ENV);
+
+BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://api.artmesto.students.nomoredomains.monster'
+  : 'http://localhost:3000';
+
+console.log(process.env)
+
 const app = express();
 
 app.use(cors());
