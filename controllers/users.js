@@ -5,19 +5,7 @@ const User = require('../models/user');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const NotFoundError = require('../errors/NotFoundError');
-// const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
-
-// const getUser = (req, res, next) => {
-//   User.findOne({ _id: req.params.id })
-//     .then((user) => {
-//       if (!user) {
-//         throw new NotFoundError('Нет пользователя с таким id');
-//       }
-//       return res.send(user);
-//     })
-//     .catch(next);
-// };
 
 const createUser = (req, res, next) => {
   const {
@@ -46,31 +34,10 @@ const createUser = (req, res, next) => {
     .catch(next);
 };
 
-// const updateUser = (req, res, next) => {
-//   const { _id } = req.user;
-//   const { name, about } = req.body;
-//   User.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
-//     .then((user) => {
-//       if (!user) {
-//         return res.status(404).send({ message: 'Нет пользователя с таким id' });
-//       }
-//       return res.send(user);
-//     })
-//     .catch((err) => {
-//       if (err.name === 'ValidationError') {
-//         throw new BadRequestError('переданы некорректные данные в метод');
-//       }
-//     })
-//     .catch(next);
-// };
-
 const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      // if (!user.email || !user.password) {
-      //   throw new ConflictError('Неправильные почта или пароль');
-      // }
       // аутентификация успешна! пользователь в переменной user
       // В пейлоуд токена следует записывать только свойство _id
       // содержащее идентификатор пользователя
@@ -99,9 +66,7 @@ const getUserInfo = (req, res, next) => {
 };
 
 module.exports = {
-  // getUser,
   createUser,
-  // updateUser,
   login,
   getUserInfo,
 };

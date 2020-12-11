@@ -15,14 +15,6 @@ const { login, createUser } = require('./controllers/users.js');
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
-// console.log(process.env.NODE_ENV);
-
-BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://api.artmesto.students.nomoredomains.monster'
-  : 'http://localhost:3000';
-
-console.log(process.env)
-
 const app = express();
 
 app.use(cors());
@@ -43,12 +35,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger); // подключаем логгер запросов
-
-// app.get('/crash-test', () => {
-//   setTimeout(() => {
-//     throw new Error('Сервер сейчас упадёт');
-//   }, 0);
-// });
 
 // роуты для логина и регистрации не требующие авторизации
 app.post('/signup', celebrate({

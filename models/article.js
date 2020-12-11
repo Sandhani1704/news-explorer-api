@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const isURL = require("validator/lib/isURL");
 
 const articleSchema = new mongoose.Schema({
   keyword: {
@@ -35,9 +36,7 @@ const articleSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator(v) {
-        return /^http[s]?:\/\/\w+/.test(v);
-      },
+      validator: (v) => isURL(v),
       message: 'Ошибка в ссылке',
     },
   },
