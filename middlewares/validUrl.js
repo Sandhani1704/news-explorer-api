@@ -1,6 +1,5 @@
 const validator = require('validator');
-const BadRequestError = require('../errors/BadRequestError')
-
+const BadRequestError = require('../errors/BadRequestError');
 
 // Валидация адреса
 module.exports = (v) => {

@@ -3,7 +3,6 @@ const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 
-
 // возвращает все сохранённые пользователем статьи
 const getArticles = (req, res, next) => {
   Article.find({})
@@ -15,7 +14,7 @@ const getArticles = (req, res, next) => {
 const createArticle = (req, res, next) => {
   const { _id } = req.user;
   const {
-    keyword, title, text, date, source, link, image
+    keyword, title, text, date, source, link, image,
   } = req.body;
   Article.create({
     keyword, title, text, date, source, link, image, owner: _id,
@@ -32,7 +31,7 @@ const createArticle = (req, res, next) => {
 // удаляет сохранённую статью  по _id
 const deleteArticle = (req, res, next) => {
   Article.findById(req.params.articleId)
-  .select("+owner")
+    .select('+owner')
     .then((article) => {
       if (!article) {
         throw new NotFoundError('Нет статьи с таким id');
@@ -50,4 +49,4 @@ module.exports = {
   getArticles,
   createArticle,
   deleteArticle,
-}
+};
