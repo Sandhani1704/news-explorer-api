@@ -1,21 +1,24 @@
 require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
+const { limiter } = require('./middlewares/rate-limiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const auth = require('./middlewares/auth');
-const routerUsers = require('./routes/users.js');
-const routerArticles = require('./routes/article.js');
-const routerNonexistent = require('./routes/nonexistent.js');
-const { login, createUser } = require('./controllers/users.js');
+const generalRouter = require('./routes/index');
+const errorHandler = require('./middlewares/error-handler');
 
 // Слушаем 3000 порт
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, MONGODB, NODE_ENV } = process.env;
+// console.log(process.env);
 
 const app = express();
+
+app.use(limiter);
+
+app.use(helmet());
 
 app.use(cors());
 
@@ -25,7 +28,7 @@ app.use((req, res, next) => {
   next();
 });
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect(NODE_ENV === 'production' ? MONGODB : 'mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -36,41 +39,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger); // подключаем логгер запросов
 
-// роуты для логина и регистрации не требующие авторизации
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(6),
-  }),
-}), createUser);
-
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(6),
-  }),
-}), login);
-
-// сначала вызовется auth, а затем, если авторизация успешна, routerUsers
-app.use('/', auth, routerUsers);
-// сначала вызовется auth, а затем, если авторизация успешна, createArticle
-app.use('/', auth, routerArticles);
-app.get('/users/me', auth, routerUsers);
-app.use('/', routerNonexistent);
+app.use('/', generalRouter);
 
 app.use(errorLogger); // подключаем логгер ошибок
 
 app.use(errors()); // обработчик ошибок celebrate
 
-app.use((err, req, res, next) => {
-  if (err.status) {
-    res.status(err.status).send({ message: err.message });
-    return;
-  }
-  res.status(500).send({ message: `На сервере произошла ошибка: ${err.message}` });
-  next();
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
