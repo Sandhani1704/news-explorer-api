@@ -5,7 +5,7 @@ const BadRequestError = require('../errors/BadRequestError');
 
 // возвращает все сохранённые пользователем статьи
 const getArticles = (req, res, next) => {
-  Article.find({})
+  Article.find({}).select('+owner')
     .then((data) => res.send(data))
     .catch(next);
 };

@@ -4,7 +4,7 @@ const validUrl = require('../middlewares/validUrl');
 const createArticleValid = celebrate({
   body: Joi.object().keys({
     keyword: Joi.string().required().min(2).max(30),
-    title: Joi.string().required().min(2).max(30),
+    title: Joi.string().required().min(2),
     text: Joi.string().min(2).required(),
     date: Joi.string().min(2).required(),
     source: Joi.string().min(2).required(),
