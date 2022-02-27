@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -8,7 +9,7 @@ const { limiter } = require('./middlewares/rate-limiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const generalRouter = require('./routes/index');
 const errorHandler = require('./middlewares/error-handler');
-const { corsOptions } = require('./middlewares/cors');
+const { requestCors } = require('./middlewares/cors');
 
 // Слушаем 3000 порт
 const { PORT = 3000, MONGODB, NODE_ENV } = process.env;
@@ -20,7 +21,8 @@ app.use(limiter);
 
 app.use(helmet());
 
-app.use('*', corsOptions);
+app.use(cors());
+app.use(requestCors);
 
 mongoose.connect(NODE_ENV === 'production' ? MONGODB : 'mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
